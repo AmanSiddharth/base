@@ -1,0 +1,810 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Secret Vault · DM Cinema & Memories</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 30% 10%, #0a0f1e, #020408);
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Inter', Roboto, Helvetica, sans-serif;
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* GLASS CARD */
+    .glass-card {
+      background: rgba(12, 20, 35, 0.75);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* PASS PAGE */
+    .pass-container {
+      max-width: 460px;
+      margin: 5vh auto;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .neon-title {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e0eaff, #7aa2f7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .pass-input {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1.5px solid #3b82f6;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      text-align: center;
+      color: white;
+      letter-spacing: 4px;
+      font-weight: 500;
+      outline: none;
+      margin: 1rem 0;
+    }
+
+    .enter-btn {
+      background: linear-gradient(105deg, #2563eb, #1e40af);
+      border: none;
+      padding: 0.9rem;
+      width: 100%;
+      border-radius: 60px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .error-msg {
+      color: #ffaa99;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      min-height: 45px;
+    }
+
+    /* FOOTER STYLE */
+    .global-footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 16px;
+      font-size: 0.85rem;
+      color: #8e9fc3;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      width: 100%;
+      max-width: 500px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    .global-footer span {
+      color: #facc15;
+      font-weight: 600;
+    }
+
+    /* MAIN APP - FULL WIDTH MOBILE FRIENDLY */
+    .main-app {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* stacked layout for mobile, two column for tablet+ */
+    .dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* VIDEO SECTION */
+    .section-card {
+      background: rgba(8, 14, 26, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: 1.8rem;
+      padding: 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #f0f3ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .admin-badge {
+      background: #2d3a5e;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .admin-badge.active {
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+    }
+
+    /* VIDEO GRID */
+    .video-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .video-item {
+      background: #00000055;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+
+    .video-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #0f172ad9;
+      flex-wrap: wrap;
+    }
+
+    .video-name {
+      font-weight: 600;
+      color: white;
+      font-size: 1rem;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .admin-btn-sm {
+      background: rgba(255,255,240,0.15);
+      border: none;
+      padding: 4px 12px;
+      border-radius: 30px;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* PLAYER WRAPPER */
+    .player-wrapper {
+      position: relative;
+      width: 100%;
+      background: black;
+    }
+
+    .player-wrapper iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      border: none;
+    }
+
+    .custom-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #0a0f1ccc;
+      font-size: 0.75rem;
+    }
+
+    .ctrl-icon {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      padding: 4px 8px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    .quality-select {
+      background: #1e293b;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+    }
+
+    /* MEMORIES - BIGGER & VISIBLE */
+    .memories-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .memory-post {
+      background: linear-gradient(145deg, #101826, #070c18);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(255,215,0,0.3);
+      transition: 0.2s;
+    }
+
+    .memory-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 1.2rem;
+      background: #1e293b;
+      border: 1px solid #ffffff30;
+    }
+
+    .memory-caption {
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0 6px;
+    }
+
+    .memory-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* FLOATING ADMIN QUICK PANEL */
+    .quick-admin-panel {
+      background: #0f172ae6;
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .quick-btn {
+      background: #2c3e66;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 60px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      flex: 1 0 auto;
+      cursor: pointer;
+    }
+
+    /* MODAL (mobile friendly) */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border-radius: 2rem;
+      padding: 1.8rem;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid #3b82f6;
+    }
+
+    .modal-box input, .modal-box textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #1e293b;
+      border: 1px solid #5b8cff;
+      border-radius: 30px;
+      color: white;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      justify-content: flex-end;
+    }
+
+    button { cursor: pointer; }
+
+    @media (min-width: 780px) {
+      .dashboard {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .videos-section { flex: 2; }
+      .memories-section { flex: 1.5; }
+      .memory-post { flex-direction: row; align-items: center; }
+      .memory-img { width: 120px; aspect-ratio: 4/3; }
+      .memory-caption { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PASS PAGE -->
+<div id="passPage" class="glass-card pass-container">
+  <div class="neon-title">🔐 DM PASSCODE VAULT</div>
+  <div style="color:#aac8ff; margin-bottom: 20px;">enter master code</div>
+  <input type="password" id="passInput" class="pass-input" placeholder="···· ····" autocomplete="off">
+  <button id="unlockBtn" class="enter-btn">✦ UNLOCK REALM ✦</button>
+  <div id="passError" class="error-msg"></div>
+</div>
+
+<!-- FOOTER (visible on pass page) -->
+<div id="globalFooter" class="global-footer">
+  ✦ Developed by <span>AMAN SIDDHARTH</span> ✦
+</div>
+
+<!-- MAIN APP (second page) -->
+<div id="mainApp" class="main-app">
+  <div class="dashboard">
+    <!-- LEFT: VIDEO SECTION -->
+    <div class="videos-section">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>🎬 UNLISTED CINEMA</h2>
+          <button id="globalAdminBtn" class="admin-badge">👑 ADMIN MODE</button>
+        </div>
+        <div id="videosContainer" class="video-grid"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: MEMORIES COLUMN (BIGGER & VISIBLE) -->
+    <div class="memories-section">
+      <div class="section-card">
+        <div class="section-header">
+          <h2>📸 MEMORIES · POSTS</h2>
+          <button id="adminMemTrigger" class="admin-badge" style="background:#4f46e5;">+ ADD POST</button>
+        </div>
+        <div id="memoriesContainer" class="memories-gallery">
+          <!-- dynamic posts appear here with large images -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- QUICK ADMIN PANEL (visible only in admin mode) -->
+  <div id="quickAdminZone" style="margin-top: 20px; display: none;">
+    <div class="quick-admin-panel">
+      <button id="quickAddVideo" class="quick-btn">🎥 ADD YT VIDEO</button>
+      <button id="quickAddPost" class="quick-btn">🖼️ ADD MEMORY POST</button>
+      <button id="quickResetAdmin" class="quick-btn">🔒 EXIT ADMIN</button>
+    </div>
+  </div>
+  <!-- Footer inside app (optional but consistent) -->
+  <div style="text-align: center; margin-top: 30px; padding: 16px; font-size: 0.75rem; color: #6c7a9e;">
+    ✦ Developed by AMAN SIDDHARTH ✦
+  </div>
+</div>
+
+<script>
+  // ---------- DATA ----------
+  let videoList = [
+    { id: "v1", name: "✨ SECRET UNLISTED", embedId: "dQw4w9WgXcQ", qualityEnabled: true },
+    { id: "v2", name: "🌌 NEBULA DREAMS", embedId: "9bZkp7q19f0", qualityEnabled: true },
+    { id: "v3", name: "🎧 LO-FI MEMORIES", embedId: "jfKfPfyJRdk", qualityEnabled: true }
+  ];
+
+  let memoriesList = [
+    { id: "m1", imageUrl: "https://picsum.photos/id/1015/600/400", caption: "🏔️ Mountain retreat · 2024" },
+    { id: "m2", imageUrl: "https://picsum.photos/id/104/600/400", caption: "🎸 Studio sessions, late night vibes" },
+    { id: "m3", imageUrl: "https://picsum.photos/id/169/600/400", caption: "🌅 Sunset drive · forever remembered" }
+  ];
+
+  // Admin credentials
+  const ADMIN_USER = "AMAN";
+  const ADMIN_PASS = "AMAN7500";
+  let isAdminActive = false;
+
+  // Helper: generate ID
+  function uid() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+
+  // Store YouTube players (for quality & double-tap)
+  let playerInstances = new Map(); // key: videoId, value: YT player object
+
+  // Load YouTube API once
+  function loadYouTubeAPI() {
+    if (window.YT && YT.Player) return Promise.resolve();
+    return new Promise((resolve) => {
+      if (document.getElementById('yt-api-script')) {
+        const check = setInterval(() => {
+          if (window.YT && YT.Player) { clearInterval(check); resolve(); }
+        }, 200);
+        return;
+      }
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.id = 'yt-api-script';
+      document.head.appendChild(tag);
+      window.onYouTubeIframeAPIReady = () => resolve();
+    });
+  }
+
+  // Render videos with advanced controls (quality + double-tap 10s)
+  async function renderVideos() {
+    const container = document.getElementById('videosContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    await loadYouTubeAPI();
+    for (const video of videoList) {
+      const videoDiv = document.createElement('div');
+      videoDiv.className = 'video-item';
+      videoDiv.innerHTML = `
+        <div class="video-title-bar">
+          <span class="video-name">🎞️ ${escapeHtml(video.name)}</span>
+          ${isAdminActive ? `<div class="admin-actions"><button class="admin-btn-sm edit-video" data-id="${video.id}">✏️ Edit</button><button class="admin-btn-sm del-video" data-id="${video.id}">🗑️ Delete</button></div>` : ''}
+        </div>
+        <div class="player-wrapper" id="playerWrap-${video.id}">
+          <div id="ytplayer-${video.id}" style="width:100%; aspect-ratio:16/9;"></div>
+          <div class="custom-controls">
+            <button class="ctrl-icon playPauseBtn" data-id="${video.id}">⏸️</button>
+            <button class="ctrl-icon seekBackBtn" data-id="${video.id}">◀◀ 10s</button>
+            <button class="ctrl-icon seekFwdBtn" data-id="${video.id}">10s ▶▶</button>
+            <select class="quality-select" data-id="${video.id}">
+              <option value="auto">Auto</option>
+              <option value="hd1080">1080p</option>
+              <option value="hd720">720p</option>
+              <option value="large">480p</option>
+              <option value="medium">360p</option>
+            </select>
+            <span class="timeLabel" id="timeLabel-${video.id}">0:00 / 0:00</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(videoDiv);
+
+      // create player
+      const playerDivId = `ytplayer-${video.id}`;
+      const player = new YT.Player(playerDivId, {
+        videoId: video.embedId,
+        playerVars: { controls: 0, modestbranding: 1, rel: 0, origin: window.location.origin },
+        events: {
+          onReady: (event) => {
+            playerInstances.set(video.id, event.target);
+            updateTimeDisplay(video.id);
+            setInterval(() => updateTimeDisplay(video.id), 500);
+            // double-tap on wrapper for +10 sec
+            const wrapper = document.getElementById(`playerWrap-${video.id}`);
+            if (wrapper) {
+              wrapper.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                const p = playerInstances.get(video.id);
+                if (p) p.seekTo(p.getCurrentTime() + 10, true);
+              });
+            }
+          },
+          onStateChange: () => updatePlayPauseIcon(video.id)
+        }
+      });
+      playerInstances.set(video.id, player);
+    }
+
+    // attach dynamic events after render
+    attachVideoEvents();
+  }
+
+  function attachVideoEvents() {
+    document.querySelectorAll('.playPauseBtn').forEach(btn => {
+      btn.removeEventListener('click', window.ppHandler);
+      const handler = (e) => {
+        const vid = btn.dataset.id;
+        const player = playerInstances.get(vid);
+        if (player) {
+          if (player.getPlayerState() === 1) player.pauseVideo();
+          else player.playVideo();
+        }
+      };
+      btn.addEventListener('click', handler);
+      window.ppHandler = handler;
+    });
+    document.querySelectorAll('.seekBackBtn').forEach(btn => {
+      btn.onclick = () => { const p = playerInstances.get(btn.dataset.id); if(p) p.seekTo(p.getCurrentTime() - 10, true); };
+    });
+    document.querySelectorAll('.seekFwdBtn').forEach(btn => {
+      btn.onclick = () => { const p = playerInstances.get(btn.dataset.id); if(p) p.seekTo(p.getCurrentTime() + 10, true); };
+    });
+    document.querySelectorAll('.quality-select').forEach(select => {
+      select.onchange = () => { const p = playerInstances.get(select.dataset.id); if(p) p.setPlaybackQuality(select.value); };
+    });
+    // edit / delete events (admin)
+    if(isAdminActive){
+      document.querySelectorAll('.edit-video').forEach(btn => {
+        btn.onclick = () => openEditVideoModal(btn.dataset.id);
+      });
+      document.querySelectorAll('.del-video').forEach(btn => {
+        btn.onclick = () => {
+          videoList = videoList.filter(v => v.id !== btn.dataset.id);
+          renderVideos();
+        };
+      });
+    }
+  }
+
+  function updateTimeDisplay(videoId) {
+    const p = playerInstances.get(videoId);
+    if (!p || !p.getCurrentTime) return;
+    const current = p.getCurrentTime() || 0;
+    const duration = p.getDuration() || 0;
+    const label = document.getElementById(`timeLabel-${videoId}`);
+    if (label) label.innerText = `${formatTime(current)} / ${formatTime(duration)}`;
+  }
+
+  function updatePlayPauseIcon(videoId) {
+    const p = playerInstances.get(videoId);
+    if (!p) return;
+    const btn = document.querySelector(`.playPauseBtn[data-id="${videoId}"]`);
+    if (btn) btn.innerText = p.getPlayerState() === 1 ? '⏸️' : '▶️';
+  }
+
+  function formatTime(sec) {
+    if (isNaN(sec)) return "0:00";
+    const mins = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${mins}:${s < 10 ? '0'+s : s}`;
+  }
+
+  // ---------- MEMORIES RENDER (BIGGER & BETTER) ----------
+  function renderMemories() {
+    const container = document.getElementById('memoriesContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (memoriesList.length === 0) {
+      container.innerHTML = '<div style="color:#aaa; text-align:center; padding:2rem;">✨ No memories yet. Add some posts ✨</div>';
+      return;
+    }
+    memoriesList.forEach(mem => {
+      const postDiv = document.createElement('div');
+      postDiv.className = 'memory-post';
+      postDiv.innerHTML = `
+        <img class="memory-img" src="${escapeHtml(mem.imageUrl)}" alt="memory post" loading="lazy" onerror="this.src='https://picsum.photos/id/20/400/300'">
+        <div class="memory-caption">📌 ${escapeHtml(mem.caption)}</div>
+        ${isAdminActive ? `<div class="memory-footer"><button class="admin-btn-sm edit-memory" data-id="${mem.id}">✏️ Edit</button><button class="admin-btn-sm del-memory" data-id="${mem.id}">🗑️ Delete</button></div>` : ''}
+      `;
+      container.appendChild(postDiv);
+    });
+    if (isAdminActive) {
+      document.querySelectorAll('.edit-memory').forEach(btn => {
+        btn.onclick = () => openEditMemoryModal(btn.dataset.id);
+      });
+      document.querySelectorAll('.del-memory').forEach(btn => {
+        btn.onclick = () => {
+          memoriesList = memoriesList.filter(m => m.id !== btn.dataset.id);
+          renderMemories();
+        };
+      });
+    }
+  }
+
+  // ------- MODALS (Admin actions) ----------
+  let activeModal = null;
+  function closeModal() { if(activeModal) { activeModal.remove(); activeModal = null; } }
+  function showModal(title, fieldsHtml, onSave) {
+    closeModal();
+    const modalDiv = document.createElement('div');
+    modalDiv.className = 'modal-overlay';
+    modalDiv.innerHTML = `
+      <div class="modal-box">
+        <h3 style="margin-bottom:1rem; color:white;">${title}</h3>
+        ${fieldsHtml}
+        <div class="modal-buttons">
+          <button id="modalCancelBtn" style="background:#475569;">Cancel</button>
+          <button id="modalSaveBtn" style="background:#3b82f6;">Save</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modalDiv);
+    activeModal = modalDiv;
+    document.getElementById('modalCancelBtn').onclick = closeModal;
+    document.getElementById('modalSaveBtn').onclick = () => { if(onSave) onSave(); closeModal(); };
+  }
+
+  function openEditVideoModal(videoId) {
+    const video = videoList.find(v => v.id === videoId);
+    if (!video) return;
+    showModal("Edit Video", `
+      <label style="color:#ccc;">Video Name</label><input id="editVName" value="${escapeHtml(video.name)}">
+      <label style="color:#ccc;">YouTube Video ID (e.g. dQw4w9WgXcQ)</label><input id="editVId" value="${escapeHtml(video.embedId)}">
+    `, () => {
+      const newName = document.getElementById('editVName').value.trim();
+      const newId = document.getElementById('editVId').value.trim();
+      if (newName && newId) {
+        video.name = newName;
+        video.embedId = newId;
+        renderVideos();
+      } else alert("fill all fields");
+    });
+  }
+
+  function openAddVideoModal() {
+    showModal("Add New YouTube Video", `
+      <label style="color:#ccc;">Title</label><input id="addVName" placeholder="Amazing clip">
+      <label style="color:#ccc;">YouTube Video ID (from embed link)</label><input id="addVId" placeholder="dQw4w9WgXcQ">
+    `, () => {
+      const name = document.getElementById('addVName').value.trim();
+      const id = document.getElementById('addVId').value.trim();
+      if (name && id) {
+        videoList.push({ id: uid(), name, embedId: id, qualityEnabled: true });
+        renderVideos();
+      } else alert("both fields required");
+    });
+  }
+
+  function openAddMemoryPost() {
+    showModal("Add New Memory Post", `
+      <label style="color:#ccc;">Image URL (high-res recommended)</label><input id="addImg" placeholder="https://...jpg or png">
+      <label style="color:#ccc;">Caption / Description</label><textarea id="addCaption" rows="2" placeholder="Beautiful moment..."></textarea>
+    `, () => {
+      const imgUrl = document.getElementById('addImg').value.trim();
+      const caption = document.getElementById('addCaption').value.trim();
+      if (imgUrl && caption) {
+        memoriesList.unshift({ id: uid(), imageUrl: imgUrl, caption });
+        renderMemories();
+      } else alert("image and caption required");
+    });
+  }
+
+  function openEditMemoryModal(memId) {
+    const mem = memoriesList.find(m => m.id === memId);
+    if(!mem) return;
+    showModal("Edit Memory", `
+      <label>Image URL</label><input id="editImg" value="${escapeHtml(mem.imageUrl)}">
+      <label>Caption</label><textarea id="editCaption" rows="2">${escapeHtml(mem.caption)}</textarea>
+    `, () => {
+      mem.imageUrl = document.getElementById('editImg').value.trim();
+      mem.caption = document.getElementById('editCaption').value.trim();
+      renderMemories();
+    });
+  }
+
+  // ---------- ADMIN AUTH & UI ----------
+  function promptAdminAuth() {
+    const user = prompt("Admin Username:");
+    if (user !== ADMIN_USER) { alert("Invalid username"); return false; }
+    const pwd = prompt("Admin Password:");
+    if (pwd !== ADMIN_PASS) { alert("Wrong password"); return false; }
+    return true;
+  }
+
+  function setAdminMode(enable) {
+    isAdminActive = enable;
+    const adminBtn = document.getElementById('globalAdminBtn');
+    const quickZone = document.getElementById('quickAdminZone');
+    if (enable) {
+      adminBtn.innerText = '⭐ ADMIN ACTIVE ⭐';
+      adminBtn.classList.add('active');
+      quickZone.style.display = 'block';
+    } else {
+      adminBtn.innerText = '👑 ADMIN MODE';
+      adminBtn.classList.remove('active');
+      quickZone.style.display = 'none';
+    }
+    renderVideos();    // re-render with edit/delete buttons
+    renderMemories();  // re-render memory posts with edit/del
+  }
+
+  function toggleAdmin() {
+    if (!isAdminActive) {
+      if (promptAdminAuth()) {
+        setAdminMode(true);
+        alert("Admin mode ON. Now you can add/edit videos & posts.");
+      }
+    } else {
+      setAdminMode(false);
+      alert("Admin mode OFF");
+    }
+  }
+
+  // ---------- PASSCODE LOGIC WITH SPECIAL MESSAGE & FOOTER ----------
+  const passPage = document.getElementById('passPage');
+  const mainApp = document.getElementById('mainApp');
+  const passInput = document.getElementById('passInput');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const errorSpan = document.getElementById('passError');
+  const footerEl = document.getElementById('globalFooter');
+
+  function showStalkingMessage() {
+    // Show the exact popup message
+    alert("!! WHY ARE YOU STALKING ?!! JUS DM PASSCODE");
+    // Also display in error span with dramatic style
+    errorSpan.innerHTML = "⚠️ !! WHY ARE YOU STALKING ?!! JUS DM PASSCODE ⚠️";
+    errorSpan.style.color = "#ff8888";
+    errorSpan.style.fontWeight = "bold";
+    errorSpan.style.textShadow = "0 0 3px red";
+    setTimeout(() => {
+      if (errorSpan.innerText.includes("STALKING")) {
+        // keep but reset after 3 sec?
+      }
+    }, 3000);
+  }
+
+  function checkPasscode() {
+    const enteredCode = passInput.value.trim();
+    if (enteredCode === "16122004") {
+      // Correct passcode: hide pass page, show main app, hide footer on pass page but keep inside app? we'll hide footer and show main
+      passPage.style.display = 'none';
+      if(footerEl) footerEl.style.display = 'none';
+      mainApp.style.display = 'block';
+      renderVideos();
+      renderMemories();
+      // attach main admin button
+      document.getElementById('globalAdminBtn').onclick = toggleAdmin;
+      document.getElementById('adminMemTrigger').onclick = () => {
+        if (isAdminActive) openAddMemoryPost();
+        else alert("Enable Admin Mode first (top right button)");
+      };
+      // quick admin panel buttons
+      document.getElementById('quickAddVideo').onclick = () => { if(isAdminActive) openAddVideoModal(); else alert("Admin mode required"); };
+      document.getElementById('quickAddPost').onclick = () => { if(isAdminActive) openAddMemoryPost(); else alert("Admin mode required"); };
+      document.getElementById('quickResetAdmin').onclick = () => { setAdminMode(false); };
+      setAdminMode(false); // start without admin
+    } else {
+      // WRONG PASSCODE: show the stalking popup message
+      showStalkingMessage();
+      passInput.value = '';
+      // shake effect
+      passInput.style.transform = 'shake 0.2s ease';
+      setTimeout(() => { passInput.style.transform = ''; }, 300);
+    }
+  }
+  
+  // Add keypress event
+  unlockBtn.addEventListener('click', checkPasscode);
+  passInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkPasscode(); });
+
+  function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ return m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'; }); }
+</script>
+</body>
+</html>
